@@ -32,6 +32,8 @@ const (
 	viewUri = "/view/"
 )
 
+var templates = template.Must(template.ParseFiles(editTemplate, viewTemplate))
+
 // getFileName build file name base on tile + the file extension
 func getFileName(title string) string {
 	return title + txtExtension
@@ -117,14 +119,15 @@ func saveHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	http.Redirect(responseWriter, r, viewUri+title, http.StatusFound)
 }
 
-//renderTemplate: Load html template from a file and render page content to send back to client
+//renderTemplate: Load html template from the template cache and render page content to send back to client
 func renderTemplate(responseWriter http.ResponseWriter, pg *Page, templateName string) {
-	t, err := template.ParseFiles(templateName)
-	if err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	err = t.Execute(responseWriter, pg)
+	//t, err := template.ParseFiles(templateName)
+	//if err != nil {
+	//	http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+	//	return
+	//}
+	//err = t.Execute(responseWriter, pg)
+	err := templates.ExecuteTemplate(responseWriter, templateName, pg)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 	}
