@@ -104,7 +104,14 @@ func editHandler(responseWriter http.ResponseWriter, r *http.Request) {
 }
 
 func saveHandler(responseWriter http.ResponseWriter, r *http.Request) {
-
+	title := r.URL.Path[len(saveUri):]
+	body := r.FormValue("body")
+	pg := Page{
+		Title: title,
+		Body:  []byte(body),
+	}
+	pg.save()
+	http.Redirect(responseWriter, r, viewUri+title, http.StatusFound)
 }
 
 //renderTemplate: Load html template from a file and render page content to send back to client
