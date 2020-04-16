@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 )
 
 // Page: Holds page we need to save/load
@@ -32,7 +34,11 @@ const (
 	viewUri = "/view/"
 )
 
+//templates: Html templates cache loaded from disk
 var templates = template.Must(template.ParseFiles(editTemplate, viewTemplate))
+
+//validPath: Regular expression to be validate that we have a valid path to save and retrieve files
+var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 // getFileName build file name base on tile + the file extension
 func getFileName(title string) string {
@@ -75,6 +81,15 @@ func saveDisplayTestPage() {
 	}
 }
 
+func getTitle(responseWriter http.ResponseWriter, r *http.Request) (string, error) {
+	match := validPath.FindStringSubmatch(r.URL.Path)
+	if match == nil {
+		http.NotFound(responseWriter, r)
+		return "", errors.New("invalid page title")
+	}
+	return match[2], nil
+}
+
 //handler: handle http request
 func handler(responseWriter http.ResponseWriter, r *http.Request) {
 	_, err := fmt.Fprintf(responseWriter, "helle from %s", r.URL.Path)
@@ -85,7 +100,11 @@ func handler(responseWriter http.ResponseWriter, r *http.Request) {
 
 //viewHandler: Handle request to view a file
 func viewHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len(viewUri):]
+	//title := r.URL.Path[len(viewUri):]
+	title, err := getTitle(responseWriter, r)
+	if err != nil {
+		return
+	}
 	pg, err := loadPage(title)
 	if err != nil {
 		http.Redirect(responseWriter, r, editUrl+title, http.StatusFound)
@@ -97,7 +116,11 @@ func viewHandler(responseWriter http.ResponseWriter, r *http.Request) {
 
 //editHandler: Handle request to edit a file
 func editHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len(editUrl):]
+	//title := r.URL.Path[len(editUrl):]
+	title, err := getTitle(responseWriter, r)
+	if err != nil {
+		return
+	}
 	pg, err := loadPage(title)
 	if err != nil {
 		pg = &Page{Title: title}
@@ -106,13 +129,17 @@ func editHandler(responseWriter http.ResponseWriter, r *http.Request) {
 }
 
 func saveHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len(saveUri):]
+	//title := r.URL.Path[len(saveUri):]
+	title, err := getTitle(responseWriter, r)
+	if err != nil {
+		return
+	}
 	body := r.FormValue("body")
 	pg := Page{
 		Title: title,
 		Body:  []byte(body),
 	}
-	err := pg.save()
+	err = pg.save()
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 	}
