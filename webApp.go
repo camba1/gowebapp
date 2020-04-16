@@ -86,7 +86,8 @@ func viewHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len(viewUri):]
 	pg, err := loadPage(title)
 	if err != nil {
-		pg = &Page{Title: title}
+		http.Redirect(responseWriter, r, editUrl+title, http.StatusFound)
+		return
 	}
 	renderTemplate(responseWriter, pg, viewTemplate)
 
