@@ -30,7 +30,7 @@ const (
 
 const (
 	editUrl = "/edit/"
-	saveUri = "/save/"
+	//saveUri = "/save/"
 	viewUri = "/view/"
 )
 
@@ -100,7 +100,6 @@ func handler(responseWriter http.ResponseWriter, r *http.Request) {
 
 //viewHandler: Handle request to view a file
 func viewHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	//title := r.URL.Path[len(viewUri):]
 	title, err := getTitle(responseWriter, r)
 	if err != nil {
 		return
@@ -116,7 +115,6 @@ func viewHandler(responseWriter http.ResponseWriter, r *http.Request) {
 
 //editHandler: Handle request to edit a file
 func editHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	//title := r.URL.Path[len(editUrl):]
 	title, err := getTitle(responseWriter, r)
 	if err != nil {
 		return
@@ -129,7 +127,6 @@ func editHandler(responseWriter http.ResponseWriter, r *http.Request) {
 }
 
 func saveHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	//title := r.URL.Path[len(saveUri):]
 	title, err := getTitle(responseWriter, r)
 	if err != nil {
 		return
