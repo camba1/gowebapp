@@ -110,14 +110,24 @@ func saveHandler(responseWriter http.ResponseWriter, r *http.Request) {
 		Title: title,
 		Body:  []byte(body),
 	}
-	pg.save()
+	err := pg.save()
+	if err != nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+	}
 	http.Redirect(responseWriter, r, viewUri+title, http.StatusFound)
 }
 
 //renderTemplate: Load html template from a file and render page content to send back to client
 func renderTemplate(responseWriter http.ResponseWriter, pg *Page, templateName string) {
-	t, _ := template.ParseFiles(templateName)
-	t.Execute(responseWriter, pg)
+	t, err := template.ParseFiles(templateName)
+	if err != nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = t.Execute(responseWriter, pg)
+	if err != nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 //startServer: Start web server and call handlers
