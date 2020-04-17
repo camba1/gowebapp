@@ -28,6 +28,7 @@ const (
 	viewTemplate = "view.html"
 )
 
+// Page uris
 const (
 	editUrl = "/edit/"
 	//saveUri = "/save/"
