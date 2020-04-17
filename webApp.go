@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -81,13 +80,27 @@ func saveDisplayTestPage() {
 	}
 }
 
-func getTitle(responseWriter http.ResponseWriter, r *http.Request) (string, error) {
-	match := validPath.FindStringSubmatch(r.URL.Path)
-	if match == nil {
-		http.NotFound(responseWriter, r)
-		return "", errors.New("invalid page title")
+//func getTitle(responseWriter http.ResponseWriter, r *http.Request) (string, error) {
+//	match := validPath.FindStringSubmatch(r.URL.Path)
+//	if match == nil {
+//		http.NotFound(responseWriter, r)
+//		return "", errors.New("invalid page title")
+//	}
+//	return match[2], nil
+//}
+
+//makeHandler: Take a http request to save/edit/view a file , validate urk, get file title and call the appropriate function
+// Note that we use closures to pass the  function we will need to call at the end of the day as
+// the first parameter to this function
+func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+	return func(responseWriter http.ResponseWriter, r *http.Request) {
+		match := validPath.FindStringSubmatch(r.URL.Path)
+		if match == nil {
+			http.NotFound(responseWriter, r)
+			return
+		}
+		fn(responseWriter, r, match[2])
 	}
-	return match[2], nil
 }
 
 //handler: handle http request
@@ -99,11 +112,11 @@ func handler(responseWriter http.ResponseWriter, r *http.Request) {
 }
 
 //viewHandler: Handle request to view a file
-func viewHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	title, err := getTitle(responseWriter, r)
-	if err != nil {
-		return
-	}
+func viewHandler(responseWriter http.ResponseWriter, r *http.Request, title string) {
+	//title, err := getTitle(responseWriter, r)
+	//if err != nil {
+	//	return
+	//}
 	pg, err := loadPage(title)
 	if err != nil {
 		http.Redirect(responseWriter, r, editUrl+title, http.StatusFound)
@@ -114,11 +127,8 @@ func viewHandler(responseWriter http.ResponseWriter, r *http.Request) {
 }
 
 //editHandler: Handle request to edit a file
-func editHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	title, err := getTitle(responseWriter, r)
-	if err != nil {
-		return
-	}
+func editHandler(responseWriter http.ResponseWriter, r *http.Request, title string) {
+	_ = r // added since we still need the handlers to be uniform so this can be called from the makeHandler function
 	pg, err := loadPage(title)
 	if err != nil {
 		pg = &Page{Title: title}
@@ -126,17 +136,14 @@ func editHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	renderTemplate(responseWriter, pg, editTemplate)
 }
 
-func saveHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	title, err := getTitle(responseWriter, r)
-	if err != nil {
-		return
-	}
+// saveHandler: Get data from the request body and save it into a new file
+func saveHandler(responseWriter http.ResponseWriter, r *http.Request, title string) {
 	body := r.FormValue("body")
 	pg := Page{
 		Title: title,
 		Body:  []byte(body),
 	}
-	err = pg.save()
+	err := pg.save()
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 	}
@@ -145,12 +152,6 @@ func saveHandler(responseWriter http.ResponseWriter, r *http.Request) {
 
 //renderTemplate: Load html template from the template cache and render page content to send back to client
 func renderTemplate(responseWriter http.ResponseWriter, pg *Page, templateName string) {
-	//t, err := template.ParseFiles(templateName)
-	//if err != nil {
-	//	http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-	//	return
-	//}
-	//err = t.Execute(responseWriter, pg)
 	err := templates.ExecuteTemplate(responseWriter, templateName, pg)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
@@ -160,9 +161,9 @@ func renderTemplate(responseWriter http.ResponseWriter, pg *Page, templateName s
 //startServer: Start web server and call handlers
 func startServer() {
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/view/", viewHandler)
-	http.HandleFunc("/edit/", editHandler)
-	http.HandleFunc("/save/", saveHandler)
+	http.HandleFunc("/view/", makeHandler(viewHandler))
+	http.HandleFunc("/edit/", makeHandler(editHandler))
+	http.HandleFunc("/save/", makeHandler(saveHandler))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
