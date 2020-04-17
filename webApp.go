@@ -23,6 +23,7 @@ const (
 
 // Html templates
 const (
+	templatesDir = "htmlTemplates/"
 	editTemplate = "edit.html"
 	viewTemplate = "view.html"
 )
@@ -34,7 +35,7 @@ const (
 )
 
 //templates: Html templates cache loaded from disk
-var templates = template.Must(template.ParseFiles(editTemplate, viewTemplate))
+var templates = template.Must(template.ParseFiles(templatesDir+editTemplate, templatesDir+viewTemplate))
 
 //validPath: Regular expression to be validate that we have a valid path to save and retrieve files
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
