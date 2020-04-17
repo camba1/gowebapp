@@ -9,9 +9,8 @@
 
     <div>
         <p>Files in the system:</p>
-        {{range .Names}}
-{{/*            <a href="/edit/{{.Title}}">edit</a>]*/}}
-            {{.}} <br>
+        {{range .FullNames}}
+            <a href="/view/{{.}}">{{.}}</a> <br>
         {{end}}
         <p>File count: {{.Count}}</p>
     </div>

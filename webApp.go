@@ -18,9 +18,10 @@ type Page struct {
 
 //fileListing: List of filenames in a directory
 type fileListing struct {
-	Count   int
-	Names   []string
-	DirName string
+	Count     int
+	Names     []string
+	FullNames []string
+	DirName   string
 }
 
 // File manipulation constants
@@ -84,25 +85,24 @@ func loadFileListing(dirName string) ([]os.FileInfo, error) {
 
 //listDirFiles: Load the count and names of the files in a directory into the fileListing struct
 func listDirFiles(directory string) (fileListing, error) {
+	files := fileListing{DirName: directory}
 	filesInDir, err := loadFileListing(directory)
-	files := fileListing{}
 	if err != nil {
-		files = fileListing{
-			Count:   0,
-			Names:   nil,
-			DirName: directory,
-		}
+		//Do nothing
 	} else {
 		filesTmp := make([]string, len(filesInDir))
+		filesFullTmp := make([]string, len(filesInDir))
 		for i, info := range filesInDir {
 			if !info.IsDir() {
 				filesTmp[i] = info.Name()
+				filesFullTmp[i] = info.Name()[:len(info.Name())-4]
 			}
 		}
 		files = fileListing{
-			Count:   len(filesTmp),
-			Names:   filesTmp,
-			DirName: directory,
+			Count:     len(filesTmp),
+			Names:     filesTmp,
+			FullNames: filesFullTmp,
+			DirName:   directory,
 		}
 	}
 	return files, err
