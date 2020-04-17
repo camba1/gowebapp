@@ -19,6 +19,7 @@ type Page struct {
 const (
 	txtExtension      string = ".txt"
 	readWriteFileMode        = 0600
+	filesDir                 = "files/"
 )
 
 // Html templates
@@ -43,7 +44,7 @@ var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 // getFileName build file name base on tile + the file extension
 func getFileName(title string) string {
-	return title + txtExtension
+	return filesDir + title + txtExtension
 }
 
 //save: Save a page to disk
