@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 )
 
@@ -13,6 +14,13 @@ import (
 type Page struct {
 	Title string
 	Body  []byte
+}
+
+//fileListing: List of filenames in a directory
+type fileListing struct {
+	Count   int
+	Names   []string
+	DirName string
 }
 
 // File manipulation constants
@@ -24,9 +32,10 @@ const (
 
 // Html templates
 const (
-	templatesDir = "htmlTemplates/"
-	editTemplate = "edit.html"
-	viewTemplate = "view.html"
+	templatesDir  = "htmlTemplates/"
+	editTemplate  = "edit.html"
+	viewTemplate  = "view.html"
+	indexTemplate = "index.html"
 )
 
 // Page uris
@@ -37,7 +46,7 @@ const (
 )
 
 //templates: Html templates cache loaded from disk
-var templates = template.Must(template.ParseFiles(templatesDir+editTemplate, templatesDir+viewTemplate))
+var templates = template.Must(template.ParseFiles(templatesDir+editTemplate, templatesDir+viewTemplate, templatesDir+indexTemplate))
 
 //validPath: Regular expression to be validate that we have a valid path to save and retrieve files
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
@@ -62,6 +71,15 @@ func loadPage(title string) (*Page, error) {
 		return nil, err
 	}
 	return &Page{title, body}, nil
+}
+
+//loadFileListing: Get the list of files in a given directory
+func loadFileListing(dirName string) ([]os.FileInfo, error) {
+	fileListing, err := ioutil.ReadDir(dirName)
+	if err != nil {
+		return nil, err
+	}
+	return fileListing, nil
 }
 
 //saveDisplayTestPage: Save a string into a file. Reload the file and display content.
@@ -108,9 +126,31 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 
 //handler: handle http request
 func handler(responseWriter http.ResponseWriter, r *http.Request) {
-	_, err := fmt.Fprintf(responseWriter, "helle from %s", r.URL.Path)
+	_ = r
+	filesInDir, err := loadFileListing(filesDir)
+	files := fileListing{}
 	if err != nil {
-		return
+		files = fileListing{
+			Count:   0,
+			Names:   nil,
+			DirName: filesDir,
+		}
+	} else {
+		filesTmp := make([]string, len(filesInDir))
+		for i, info := range filesInDir {
+			if !info.IsDir() {
+				filesTmp[i] = info.Name()
+			}
+		}
+		files = fileListing{
+			Count:   len(filesTmp),
+			Names:   filesTmp,
+			DirName: filesDir,
+		}
+	}
+	err = templates.ExecuteTemplate(responseWriter, indexTemplate, files)
+	if err != nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
 	}
 }
 

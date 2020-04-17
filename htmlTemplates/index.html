@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to File loader</title>
+</head>
+<body>
+    <h1>Welcome to File Saver</h1>
+
+    <div>
+        <p>Files in the system:</p>
+        {{range .Names}}
+            {{.}} <br>
+        {{end}}
+        <p>File count: {{.Count}}</p>
+    </div>
+</body>
+</html>
