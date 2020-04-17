@@ -10,6 +10,7 @@
     <div>
         <p>Files in the system:</p>
         {{range .Names}}
+{{/*            <a href="/edit/{{.Title}}">edit</a>]*/}}
             {{.}} <br>
         {{end}}
         <p>File count: {{.Count}}</p>

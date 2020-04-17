@@ -82,6 +82,32 @@ func loadFileListing(dirName string) ([]os.FileInfo, error) {
 	return fileListing, nil
 }
 
+//listDirFiles: Load the count and names of the files in a directory into the fileListing struct
+func listDirFiles(directory string) (fileListing, error) {
+	filesInDir, err := loadFileListing(directory)
+	files := fileListing{}
+	if err != nil {
+		files = fileListing{
+			Count:   0,
+			Names:   nil,
+			DirName: directory,
+		}
+	} else {
+		filesTmp := make([]string, len(filesInDir))
+		for i, info := range filesInDir {
+			if !info.IsDir() {
+				filesTmp[i] = info.Name()
+			}
+		}
+		files = fileListing{
+			Count:   len(filesTmp),
+			Names:   filesTmp,
+			DirName: directory,
+		}
+	}
+	return files, err
+}
+
 //saveDisplayTestPage: Save a string into a file. Reload the file and display content.
 func saveDisplayTestPage() {
 	pageTitle := "History"
@@ -127,27 +153,7 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.Handl
 //handler: handle http request
 func handler(responseWriter http.ResponseWriter, r *http.Request) {
 	_ = r
-	filesInDir, err := loadFileListing(filesDir)
-	files := fileListing{}
-	if err != nil {
-		files = fileListing{
-			Count:   0,
-			Names:   nil,
-			DirName: filesDir,
-		}
-	} else {
-		filesTmp := make([]string, len(filesInDir))
-		for i, info := range filesInDir {
-			if !info.IsDir() {
-				filesTmp[i] = info.Name()
-			}
-		}
-		files = fileListing{
-			Count:   len(filesTmp),
-			Names:   filesTmp,
-			DirName: filesDir,
-		}
-	}
+	files, err := listDirFiles(filesDir)
 	err = templates.ExecuteTemplate(responseWriter, indexTemplate, files)
 	if err != nil {
 		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
