@@ -51,6 +51,7 @@ var templates = template.Must(template.ParseFiles(templatesDir+editTemplate, tem
 
 //validPath: Regular expression to be validate that we have a valid path to save and retrieve files
 var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
+var validFileName = regexp.MustCompile("^([a-zA-Z0-9]+)$")
 
 // getFileName build file name base on tile + the file extension
 func getFileName(title string) string {
@@ -199,6 +200,16 @@ func saveHandler(responseWriter http.ResponseWriter, r *http.Request, title stri
 	http.Redirect(responseWriter, r, viewUri+title, http.StatusFound)
 }
 
+func newHandler(responseWriter http.ResponseWriter, r *http.Request) {
+	match := validFileName.FindStringSubmatch(r.FormValue("fileName"))
+	if match == nil {
+		http.Error(responseWriter, "Invalid file name. Please use only letters and numbers and do not enter extension.", http.StatusBadRequest)
+		return
+	}
+	title := match[1]
+	http.Redirect(responseWriter, r, viewUri+title, http.StatusFound)
+}
+
 //renderTemplate: Load html template from the template cache and render page content to send back to client
 func renderTemplate(responseWriter http.ResponseWriter, pg *Page, templateName string) {
 	err := templates.ExecuteTemplate(responseWriter, templateName, pg)
@@ -210,6 +221,7 @@ func renderTemplate(responseWriter http.ResponseWriter, pg *Page, templateName s
 //startServer: Start web server and call handlers
 func startServer() {
 	http.HandleFunc("/", handler)
+	http.HandleFunc("/new/", newHandler)
 	http.HandleFunc("/view/", makeHandler(viewHandler))
 	http.HandleFunc("/edit/", makeHandler(editHandler))
 	http.HandleFunc("/save/", makeHandler(saveHandler))

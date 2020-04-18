@@ -13,6 +13,13 @@
             <a href="/view/{{.}}">{{.}}</a> <br>
         {{end}}
         <p>File count: {{.Count}}</p>
+
+        <form action="/new">
+            <label for="fileName">New file:</label>
+            <input type="text" id="fileName" name="fileName" required placeholder="Enter new file name">
+            <input type="submit" value="Create">
+        </form>
+
     </div>
 </body>
 </html>
