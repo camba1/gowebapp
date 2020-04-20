@@ -16,13 +16,23 @@ type Page struct {
 	Body  []byte
 }
 
+type fileSpec struct {
+	Name     string
+	ModTime  string
+	Size     int64
+	FullName string
+}
+
 //fileListing: List of filenames in a directory
 type fileListing struct {
 	Count     int
 	Names     []string
 	FullNames []string
 	DirName   string
+	Files     []fileSpec
 }
+
+const dateFormat string = "Jan-02-06"
 
 // File manipulation constants
 const (
@@ -91,19 +101,21 @@ func listDirFiles(directory string) (fileListing, error) {
 	if err != nil {
 		//Do nothing
 	} else {
-		filesTmp := make([]string, len(filesInDir))
-		filesFullTmp := make([]string, len(filesInDir))
+		fileSpecs := make([]fileSpec, len(filesInDir))
 		for i, info := range filesInDir {
 			if !info.IsDir() {
-				filesTmp[i] = info.Name()
-				filesFullTmp[i] = info.Name()[:len(info.Name())-4]
+				fileSpecs[i] = fileSpec{
+					FullName: info.Name(),
+					Name:     info.Name()[:len(info.Name())-4],
+					ModTime:  info.ModTime().Format(dateFormat),
+					Size:     info.Size(),
+				}
 			}
 		}
 		files = fileListing{
-			Count:     len(filesTmp),
-			Names:     filesTmp,
-			FullNames: filesFullTmp,
-			DirName:   directory,
+			Count:   len(fileSpecs),
+			DirName: directory,
+			Files:   fileSpecs,
 		}
 	}
 	return files, err
@@ -127,15 +139,6 @@ func saveDisplayTestPage() {
 		fmt.Println(pgLd.Title + ": " + string(pgLd.Body))
 	}
 }
-
-//func getTitle(responseWriter http.ResponseWriter, r *http.Request) (string, error) {
-//	match := validPath.FindStringSubmatch(r.URL.Path)
-//	if match == nil {
-//		http.NotFound(responseWriter, r)
-//		return "", errors.New("invalid page title")
-//	}
-//	return match[2], nil
-//}
 
 //makeHandler: Take a http request to save/edit/view a file , validate urk, get file title and call the appropriate function
 // Note that we use closures to pass the  function we will need to call at the end of the day as
