@@ -8,6 +8,7 @@ import (
 	"regexp"
 )
 
+//dateFormat: Formatting to dislpay dates in the screen
 const dateFormat string = "Jan-02-06"
 
 // File manipulation constants
@@ -40,87 +41,6 @@ var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 //validFileName: Validate that the file name only contains letters and numbers
 var validFileName = regexp.MustCompile("^([a-zA-Z0-9]+)$")
-
-//makeHandler: Take a http request to save/edit/view a file , validate urk, get file title and call the appropriate function
-// Note that we use closures to pass the  function we will need to call at the end of the day as
-// the first parameter to this function
-func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
-	return func(responseWriter http.ResponseWriter, r *http.Request) {
-		match := validPath.FindStringSubmatch(r.URL.Path)
-		if match == nil {
-			http.NotFound(responseWriter, r)
-			return
-		}
-		fn(responseWriter, r, match[2])
-	}
-}
-
-//handler: handle http request
-func handler(responseWriter http.ResponseWriter, r *http.Request) {
-	_ = r
-	files, err := fileManager.ListDirFiles(filesDir, dateFormat)
-	err = templates.ExecuteTemplate(responseWriter, indexTemplate, files)
-	if err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-//viewHandler: Handle request to view a file
-func viewHandler(responseWriter http.ResponseWriter, r *http.Request, title string) {
-	//title, err := getTitle(responseWriter, r)
-	//if err != nil {
-	//	return
-	//}
-	pg, err := fileManager.LoadPage(title, filesDir, txtExtension)
-	if err != nil {
-		http.Redirect(responseWriter, r, editUrl+title, http.StatusFound)
-		return
-	}
-	renderTemplate(responseWriter, pg, viewTemplate)
-
-}
-
-//editHandler: Handle request to edit a file
-func editHandler(responseWriter http.ResponseWriter, r *http.Request, title string) {
-	_ = r // added since we still need the handlers to be uniform so this can be called from the makeHandler function
-	pg, err := fileManager.LoadPage(title, filesDir, txtExtension)
-	if err != nil {
-		pg = &fileManager.Page{Title: title}
-	}
-	renderTemplate(responseWriter, pg, editTemplate)
-}
-
-// saveHandler: Get data from the request body and save it into a new file
-func saveHandler(responseWriter http.ResponseWriter, r *http.Request, title string) {
-	body := r.FormValue("body")
-	pg := fileManager.Page{
-		Title: title,
-		Body:  []byte(body),
-	}
-	err := pg.Save(filesDir, txtExtension, readWriteFileMode)
-	if err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-	}
-	http.Redirect(responseWriter, r, viewUri+title, http.StatusFound)
-}
-
-func newHandler(responseWriter http.ResponseWriter, r *http.Request) {
-	match := validFileName.FindStringSubmatch(r.FormValue("fileName"))
-	if match == nil {
-		http.Error(responseWriter, "Invalid file name. Please use only letters and numbers and do not enter extension.", http.StatusBadRequest)
-		return
-	}
-	title := match[1]
-	http.Redirect(responseWriter, r, viewUri+title, http.StatusFound)
-}
-
-//renderTemplate: Load html template from the template cache and render page content to send back to client
-func renderTemplate(responseWriter http.ResponseWriter, pg *fileManager.Page, templateName string) {
-	err := templates.ExecuteTemplate(responseWriter, templateName, pg)
-	if err != nil {
-		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
-	}
-}
 
 //startServer: Start web server and call handlers
 func startServer() {
