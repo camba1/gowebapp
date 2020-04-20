@@ -2,18 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>File Editor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
 </head>
 <body>
-    <h1>Editing {{.Title}}</h1>
+    <div class="container">
+        <section class="hero is-light">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title"> Welcome To File Saver</h1>
+                    <h2 class="subtitle">
+                        <p class="subtitle is-4">Editing {{.Title}}</p>
+                    </h2>
+                </div>
+            </div>
+        </section>
 
-    <form action="/save/{{.Title}}" method="POST">
-        <label>
-                <textarea name="body" rows="20" cols="80">{{printf "%s" .Body}}</textarea>
-            </label>
-        <div><input type="submit" value="Save">
-            <button type="button" onclick="history.back()">Cancel</button>
-        </div>
-    </form>
+        <form action="/save/{{.Title}}" method="POST">
+            <label>
+                    <textarea class="textarea" name="body">{{printf "%s" .Body}}</textarea>
+                </label>
+            <div><input class="button is-primary" type="submit" value="Save">
+                <button class="button is-info" type="button" onclick="history.back()">Cancel</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

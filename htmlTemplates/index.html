@@ -2,23 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Welcome to File loader</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
 </head>
 <body>
-    <h1>Welcome to File Saver</h1>
 
-    <div>
-        <p>Files in the system:</p>
-        {{range .FullNames}}
-            <a href="/view/{{.}}">{{.}}</a> <br>
-        {{end}}
-        <p>File count: {{.Count}}</p>
+    <div class="container">
 
-        <form action="/new">
-            <label for="fileName">New file:</label>
-            <input type="text" id="fileName" name="fileName" required placeholder="Enter new file name">
-            <input type="submit" value="Create">
-        </form>
+        <section class="hero is-light">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title"> Welcome To File Saver</h1>
+                    <h2 class="subtitle">
+                        <p class="subtitle is-4">Files in the system: {{.Count}}</p>
+                    </h2>
+                </div>
+            </div>
+        </section>
+
+        <div class="columns">
+            <div class="column is-half">
+                {{range .Files}}
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                <a href="/view/{{.Name}}">{{.Name}}</a> <br>
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content">
+                                Last modified : {{.ModTime}} <br>
+                                Size: {{.Size}} KB<br>
+                            </div>
+                        </div>
+                    </div><br>
+                {{end}}
+            </div>
+            <div class="column is-half">
+                <form action="/new">
+                    <label class="label" for="fileName">New file:</label>
+                    <input class="input" type="text" id="fileName" name="fileName" required placeholder="Enter new file name">
+                    <input class="button is-primary" type="submit" value="Create">
+                </form>
+            </div>
+        </div>
 
     </div>
 </body>

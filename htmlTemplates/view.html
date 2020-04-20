@@ -2,15 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>View File</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
 </head>
 <body>
-    <h1>{{.Title}}</h1>
+    <div class="container">
+        <section class="hero is-light">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title"> Welcome To File Saver</h1>
+                    <h2 class="subtitle">
+                        <p class="subtitle is-4">{{.Title}}</p>
+                    </h2>
+                </div>
+            </div>
+        </section>
 
-    <p>[<a href="/edit/{{.Title}}">edit</a>]</p>
-
-    <div>{{printf "%s" .Body}}</div>
-
-    <p>[<a href="/">Home</a>]</p>
+        <textarea class="textarea" readonly>{{printf "%s" .Body}}</textarea>
+        <p>
+            <a class="button is-primary" href="/edit/{{.Title}}">Edit</a>
+            <a href="/" class="button is-info">Home</a>
+        </p>
+    </div>
 </body>
 </html>
