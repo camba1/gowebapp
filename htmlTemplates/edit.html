@@ -17,11 +17,11 @@
                     </h2>
                 </div>
             </div>
-        </section>
+        </section><br>
 
         <form action="/save/{{.Title}}" method="POST">
             <label>
-                    <textarea class="textarea" name="body">{{printf "%s" .Body}}</textarea>
+                    <textarea class="textarea" name="body">{{printf "%s" .Body}}</textarea><br>
                 </label>
             <div><input class="button is-primary" type="submit" value="Save">
                 <button class="button is-info" type="button" onclick="history.back()">Cancel</button>
