@@ -16,6 +16,7 @@ type Page struct {
 	Body  []byte
 }
 
+// fileSpec: File system details for a file
 type fileSpec struct {
 	Name     string
 	ModTime  string
