@@ -2,6 +2,7 @@ package main
 
 import (
 	"./fileManager"
+	"io"
 	"net/http"
 )
 
@@ -76,6 +77,18 @@ func newHandler(responseWriter http.ResponseWriter, r *http.Request) {
 	}
 	title := match[1]
 	http.Redirect(responseWriter, r, viewUri+title, http.StatusFound)
+}
+
+func healthCheckHandler(responseWriter http.ResponseWriter, r *http.Request) {
+	// A very simple health check.
+	_ = r
+	responseWriter.WriteHeader(http.StatusOK)
+	responseWriter.Header().Set("Content-Type", "application/json")
+
+	_, err := io.WriteString(responseWriter, `{"alive": true}`)
+	if err != nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 //renderTemplate: Load html template from the template cache and render page content to send back to client
