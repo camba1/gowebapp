@@ -49,3 +49,29 @@ Finally, if you want more details, you can use the -json flag eg:
 ```bash
 go test -json
 ``` 
+
+### Documentation
+In typical Go manner the documentation is extracted directly from the comments in the application.
+
+#### CLI
+
+To view the high level documentation in the cli, run:
+```bash
+go doc
+```
+To view the documentation for publicly exposed functions, run:
+```bash
+go doc <function name>
+```
+To view the documentation for private functions, run:
+```bash
+go doc -u <function name>
+```
+To view all the documentation except for private functions
+```bash
+go doc -all
+```
+To view all the documentation including private functions
+```bash
+go doc -u - all
+```
