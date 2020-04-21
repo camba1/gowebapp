@@ -30,7 +30,7 @@ type FileListing struct {
 	Files     []fileSpec
 }
 
-// GetFileName build file name base on tile + the file extension
+//GetFileName: build file name base on tile + the file extension
 func GetFileName(title, filesDir, txtExtension string) (string, error) {
 	if title == "" || txtExtension == "" {
 		return "", errors.New("invalid title or extension")
@@ -47,7 +47,7 @@ func loadFileListing(dirName string) ([]os.FileInfo, error) {
 	return fileListing, nil
 }
 
-// ListDirFiles: Load the count and names of the files in a directory into the FileListing struct
+//ListDirFiles: Load the count and names of the files in a directory into the FileListing struct
 func ListDirFiles(directory, dateFormat string) (FileListing, error) {
 	files := FileListing{DirName: directory}
 	filesInDir, err := loadFileListing(directory)
