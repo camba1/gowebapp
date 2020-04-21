@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-//dateFormat: Formatting to dislpay dates in the screen
+//dateFormat: Formatting to display dates in the screen
 const dateFormat string = "Jan-02-06"
 
 // File manipulation constants
