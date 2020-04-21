@@ -3,43 +3,9 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
-
-//func Test_editHandler(t *testing.T) {
-//	type args struct {
-//		responseWriter http.ResponseWriter
-//		r              *http.Request
-//		title          string
-//	}
-//	tests := []struct {
-//		name string
-//		args args
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//		})
-//	}
-//}
-//
-//func Test_handler(t *testing.T) {
-//	type args struct {
-//		responseWriter http.ResponseWriter
-//		r              *http.Request
-//	}
-//	tests := []struct {
-//		name string
-//		args args
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//		})
-//	}
-//}
 
 func Test_healthCheckHandler(t *testing.T) {
 	//type args struct {
@@ -74,105 +40,44 @@ func Test_healthCheckHandler(t *testing.T) {
 	}
 }
 
-//func Test_makeHandler(t *testing.T) {
-//	type args struct {
-//		fn func(http.ResponseWriter, *http.Request, string)
-//	}
-//	tests := []struct {
-//		name string
-//		args args
-//		want http.HandlerFunc
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			if got := makeHandler(tt.args.fn); !reflect.DeepEqual(got, tt.want) {
-//				t.Errorf("makeHandler() = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
-//
-//func Test_newHandler(t *testing.T) {
-//	type args struct {
-//		responseWriter http.ResponseWriter
-//		r              *http.Request
-//	}
-//	tests := []struct {
-//		name string
-//		args args
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//		})
-//	}
-//}
-//
-//func Test_renderTemplate(t *testing.T) {
-//	type args struct {
-//		responseWriter http.ResponseWriter
-//		pg             *fileManager.Page
-//		templateName   string
-//	}
-//	tests := []struct {
-//		name string
-//		args args
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//		})
-//	}
-//}
-//
-//func Test_saveHandler(t *testing.T) {
-//	type args struct {
-//		responseWriter http.ResponseWriter
-//		r              *http.Request
-//		title          string
-//	}
-//	tests := []struct {
-//		name string
-//		args args
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//		})
-//	}
-//}
-//
-//func Test_startServer(t *testing.T) {
-//	tests := []struct {
-//		name string
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//		})
-//	}
-//}
-//
-//func Test_viewHandler(t *testing.T) {
-//	type args struct {
-//		responseWriter http.ResponseWriter
-//		r              *http.Request
-//		title          string
-//	}
-//	tests := []struct {
-//		name string
-//		args args
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//		})
-//	}
-//}
+func Test_viewHandler(t *testing.T) {
+	tests := []struct {
+		name     string
+		title    string
+		wantErr  bool
+		expected string
+	}{
+		{name: "View test history page", title: "History", wantErr: false, expected: ""},
+		{name: "Invalid page name", title: "xyz", wantErr: true, expected: "<a href=\"/edit/xyz\">Found</a>"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			title := tt.title
+			req, err := http.NewRequest("GET", "/view/"+title, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			recorder := httptest.NewRecorder()
+			handler := makeHandler(viewHandler)
+			handler.ServeHTTP(recorder, req)
+
+			if tt.wantErr {
+				if status := recorder.Code; status != http.StatusFound {
+					t.Errorf("Attempting to view non existing file returned the wrong http code: got %v, want %v", status, http.StatusFound)
+				}
+				if !strings.Contains(recorder.Body.String(), "/edit/"+title) {
+					t.Errorf("Expected redirection. Wanted address /edit/"+title+", got %v ", recorder.Body.String())
+				}
+			} else {
+				if status := recorder.Code; status != http.StatusOK {
+					t.Errorf("Attempting to view "+title+" file returned the wrong http code: got %v, want %v", status, http.StatusOK)
+				}
+
+				if recorder.Body.String() == "" {
+					t.Errorf("Recieved an empty body %v", recorder.Body.String())
+				}
+			}
+
+		})
+	}
+}
