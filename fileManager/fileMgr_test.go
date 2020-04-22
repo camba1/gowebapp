@@ -1,7 +1,6 @@
 package fileManager
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
@@ -90,8 +89,7 @@ func TestListDirFiles(t *testing.T) {
 			if !tt.wantErr {
 				foundHistory := false
 				for _, file := range got.Files {
-					fmt.Println(file.FullName + " " + file.Name + " - " + tt.want.Files[0].FullName + " " + tt.want.Files[0].Name)
-					if file.FullName != tt.want.Files[0].FullName || file.Name != tt.want.Files[0].Name {
+					if file.FullName == tt.want.Files[0].FullName && file.Name == tt.want.Files[0].Name {
 						foundHistory = true
 					}
 				}
