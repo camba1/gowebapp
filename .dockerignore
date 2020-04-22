@@ -1,0 +1,4 @@
+# Diles to be ignored when building the docker image
+bitbucket-pipelines.yml
+bin/*
+*.md
