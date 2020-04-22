@@ -8,10 +8,6 @@ import (
 )
 
 func Test_healthCheckHandler(t *testing.T) {
-	//type args struct {
-	//	responseWriter http.ResponseWriter
-	//	r              *http.Request
-	//}
 	tests := []struct {
 		name string
 		//args args
