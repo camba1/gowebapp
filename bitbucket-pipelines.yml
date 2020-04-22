@@ -19,4 +19,4 @@ pipelines:
             - export GOBIN=$GOPATH/bin
             - go get -v
             - go build -v
-            - go test -v
+            - go test -v ./...

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"./fileManager"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -46,6 +47,7 @@ func Test_viewHandler(t *testing.T) {
 		{name: "View test history page", title: "History", wantErr: false, expected: ""},
 		{name: "Invalid page name", title: "xyz", wantErr: true, expected: "<a href=\"/edit/xyz\">Found</a>"},
 	}
+	fileManager.SaveDisplayTestPage(filesDir, txtExtension, readWriteFileMode)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			title := tt.title
