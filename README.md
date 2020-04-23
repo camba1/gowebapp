@@ -87,7 +87,7 @@ docker build -t gowebapp .
 To run the app using the docker file:
 
 ```bash
-docker run -p 8080:8080 -name gowbeappcont gowebapp
+docker run -p 8080:8080 --name gowebappcont gowebapp
 ```
 
 For docker-compose, things got a bit more interesting since the host machine is running MacOS while the image is based on the golang linux image.
@@ -107,3 +107,10 @@ To get around this, there are two options:
 ```bash
 ./mycomposedown
 ```
+
+#### Hot reload
+
+The app is setup to automatically hot reload when running via docker-compose. It uses ```CompileDaemon``` to check for changes to .go files.
+
+If you would like to have the same effect when running via the docker file directly (docker run), then uncomment the ```entrypoint``` and comment out the ```cmd``` in the ```Dockerfile```
+
