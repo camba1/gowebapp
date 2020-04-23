@@ -7,3 +7,8 @@ bin/*
 **/*.md
 **/*.txt
 !History.txt
+.git/*
+.gitignore
+.idea/
+goWebAppLin
+goWebApp

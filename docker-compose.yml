@@ -1,0 +1,10 @@
+version: "3.7"
+
+services:
+  gowebapp:
+    build: .
+    container_name: gowebappcont
+    volumes:
+      - .:/go/src/goWebApp
+    ports:
+      - "8080:8080"

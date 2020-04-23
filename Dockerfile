@@ -7,7 +7,7 @@ ENV GOPATH="/gp/src/goWebAapp" GOBIN="/gp/src/goWebAapp/bin"
 COPY . .
 
 RUN go get -d  -v ./...
-RUN go build
+RUN go build -o goWebAppLin
 
 
-CMD ["./goWebApp"]
+CMD ["./goWebAppLin"]
