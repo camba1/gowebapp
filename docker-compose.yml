@@ -4,6 +4,7 @@ services:
   gowebapp:
     build: .
     container_name: gowebappcont
+    entrypoint: CompileDaemon --build="go build -o goWebAppLin" --command=./goWebAppLin
     volumes:
       - .:/go/src/goWebApp
     ports:
