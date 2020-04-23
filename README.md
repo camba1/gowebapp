@@ -75,3 +75,35 @@ To view all the documentation including private functions
 ```bash
 go doc -u - all
 ```
+### Docker
+
+The application has been setup to be able to run using docker and docker-compose.
+
+To build the docker image:
+```bash
+docker build -t gowebapp .
+```
+
+To run the app using the docker file:
+
+```bash
+docker run -p 8080:8080 -name gowbeappcont gowebapp
+```
+
+For docker-compose, things got a bit more interesting since the host machine is running MacOS while the image is based on the golang linux image.
+As such, wehn we mount the volume from the Mac to th elinux image, the application binary is not compatible with one of the two environments.
+To get around this, there are two options:
+
+- If you do not care to share the code between the host and the guest OS, then simply comment the lines in the docker-compose fiie and you can run normally using ```docker-compose up``` and ```docker-compose down```
+```bash
+   volumes:
+      - .:/go/src/goWebApp
+```
+
+- If you want to be able to share the code, then use the commands below instead of docker-compose up and docker-compose down. The commands below will create/delete linux binaries of the application (goWebAppLin) so that they can be run in the container normally.
+```bash
+./mycomposeup
+```
+```bash
+./mycomposedown
+```
