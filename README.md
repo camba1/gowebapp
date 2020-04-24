@@ -110,7 +110,30 @@ To get around this, there are two options:
 
 #### Hot reload
 
-The app is setup to automatically hot reload when running via docker-compose. It uses ```CompileDaemon``` to check for changes to .go files.
+The app is set up to automatically hot reload when running via docker-compose. It uses ```CompileDaemon``` to check for changes to .go files.
 
 If you would like to have the same effect when running via the docker file directly (docker run), then uncomment the ```entrypoint``` and comment out the ```cmd``` in the ```Dockerfile```
 
+####Multistage build
+
+The ```Dockerfilemulti``` file creates a minimal container from the app and the Alpine linux base image. The file has two stages:
+
+1. Creates a docker image based on the golang official base image. This is basically the same image created by the original Dockerfile. The only difference is that this image will also contain a binary called ```goWebAppLinAlp``` which is created to be able to run 
+our app in a linux Alpine environment.
+2. Creates a linux Alpine image that can run the application
+
+Size biggest difference between the golang image and the Alpine image. While the golang image is 858MB, the Alpine version is only 16MB (about **98%** size reduction).
+
+To create an image using the ```Dockerfilemulti```  multistage build, run:
+```bash
+goWebApp % docker build -t gowebappalpine -f Dockerfilemulti .      
+
+```
+To run the above image:
+```bash
+docker run -p 8080:8080 --name gowebappalpinecont gowebappalpine  
+```
+**Note**: We could technically delete the original Docker file and just use the multistage version. To create an image similar to the golang image curently created by the original Docker file using the multistage build, we could just run:
+```bash
+docker build --target Dev  -t gowebappfs -f Dockerfilemulti .
+```
