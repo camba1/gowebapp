@@ -114,7 +114,7 @@ The app is set up to automatically hot reload when running via docker-compose. I
 
 If you would like to have the same effect when running via the docker file directly (docker run), then uncomment the ```entrypoint``` and comment out the ```cmd``` in the ```Dockerfile```
 
-####Multistage build
+#### Multistage build
 
 The ```Dockerfilemulti``` file creates a minimal container from the app and the Alpine linux base image. The file has two stages:
 
