@@ -1,0 +1,19 @@
+FROM golang AS Dev
+WORKDIR /go/src/goWebApp
+RUN go get github.com/githubnemo/CompileDaemon
+ENV GOPATH="/gp/src/goWebAapp" GOBIN="/gp/src/goWebAapp/bin"
+COPY . .
+RUN go get -d  -v ./...
+RUN go build -o goWebAppLin
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o goWebAppLinAlp .
+CMD ["./goWebAppLin"]
+
+
+#FROM golang:alpine
+FROM alpine
+RUN apk --no-cache add ca-certificates
+WORKDIR /gowebapp
+COPY --from=Dev /go/src/goWebApp/goWebAppLinAlp goWebAppLin
+COPY --from=Dev /go/src/goWebApp/files ./files
+COPY --from=Dev /go/src/goWebApp/htmlTemplates ./htmlTemplates
+CMD ["./goWebAppLin"]
