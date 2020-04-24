@@ -6,7 +6,7 @@ bitbucket-pipelines.yml
 bin/*
 **/*.md
 **/*.txt
-!History.txt
+!files/History.txt
 .git/*
 .gitignore
 .idea/
