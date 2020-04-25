@@ -126,7 +126,7 @@ Size biggest difference between the golang image and the Alpine image. While the
 
 To create an image using the ```Dockerfilemulti```  multistage build, run:
 ```bash
-goWebApp % docker build -t gowebappalpine -f Dockerfilemulti .      
+docker build -t gowebappalpine -f Dockerfilemulti .      
 
 ```
 To run the above image:
