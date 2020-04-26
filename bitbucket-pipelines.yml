@@ -5,6 +5,8 @@
 # You can specify a custom docker image from Docker Hub as your build environment.
 image: golang:1.14
 
+options:
+  docker: true
 pipelines:
   custom:
     default:
@@ -20,3 +22,10 @@ pipelines:
             - go get -v
             - go build -v
             - go test -v ./...
+    buildimage:
+      - step:
+          script:
+            - export IMAGE_NAME=bolbeck/gowebapp:$BITBUCKET_COMMIT
+            - docker build -t $IMAGE_NAME -f Dockerfilemulti .
+            - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+            - docker push $IMAGE_NAME
