@@ -137,3 +137,12 @@ docker run -p 8080:8080 --name gowebappalpinecont gowebappalpine
 ```bash
 docker build --target Dev  -t gowebappfs -f Dockerfilemulti .
 ```
+
+### Kubernetes
+
+The application is kubernetes ready (why create kubernetes manifests for such a small app? Well, why not? :) )
+The necesary manifest are in the Kubernetes folder and you can apply them to your cluster with a simple:
+
+```bash
+kubectl apply -f .
+```
