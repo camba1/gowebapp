@@ -25,7 +25,10 @@ pipelines:
     buildimage:
       - step:
           script:
-            - export IMAGE_NAME=bolbeck/gowebapp:$BITBUCKET_COMMIT
+            - export IMAGE_NAME=bolbeck/gowebapp
+            - export IMAGE_NAME_VERSION=bolbeck/gowebapp:$BITBUCKET_COMMIT
             - docker build -t $IMAGE_NAME -f Dockerfilemulti .
             - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
             - docker push $IMAGE_NAME
+            - docker tag $IMAGE_NAME $IMAGE_NAME_VERSION
+            - docker push $IMAGE_NAME_VERSION
